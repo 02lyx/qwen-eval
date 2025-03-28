@@ -1,3 +1,5 @@
+source briter/bin/activate
+
 # Qwen2.5-Math-Instruct Series
 PROMPT_TYPE="qwen-boxed"
 
