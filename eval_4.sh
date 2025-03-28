@@ -1,13 +1,13 @@
 conda activate eval
 
 # Qwen2.5-Math-Instruct Series
-PROMPT_TYPE="qwen-brite"
+PROMPT_TYPE="qwen-brite-template"
 
 export HF_TOKEN=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
 
 # 设置要评估的模型
 MODEL_NAME_OR_PATH="Yuanxin-Liu/Qwen2.5-7B_Mix-Math-yt-rbt-grpo_0.5_exp12_no_ref_gen_8_test_8_clip_ratio_-1_outer_kl-320"
-OUTPUT_DIR="results-no-ref-0.5-320-sampling-new"
+OUTPUT_DIR="no-ref-0.5-320-sampling-template"
 
 export CUDA_VISIBLE_DEVICES=4,5,6,7
 
