@@ -1,4 +1,4 @@
-source briter/bin/activate
+conda activate eval
 
 # Qwen2.5-Math-Instruct Series
 PROMPT_TYPE="qwen-boxed"
