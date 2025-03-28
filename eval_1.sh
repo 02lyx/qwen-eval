@@ -1,7 +1,7 @@
 conda activate eval
 
 # Qwen2.5-Math-Instruct Series
-PROMPT_TYPE="qwen-boxed"
+PROMPT_TYPE="qwen-brite"
 
 export HF_TOKEN=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
 
