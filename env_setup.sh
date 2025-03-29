@@ -1,5 +1,2 @@
-conda env create -f environment.yml
-cd latex2sympy
-pip install -e .
-cd ..
-pip install -r requirements.txt 
+python pip_install_from_yaml.py
+pip install latex2sympy2

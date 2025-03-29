@@ -8,7 +8,8 @@ SPLIT="test"
 NUM_TEST_SAMPLE=-1
 
 # English open datasets
-DATA_NAME="math500,minerva_math,olympiadbench,aime24,amc23,mmlu_stem"
+DATA_NAME="math500,minerva_math,olympiadbench,aime24,amc23,mmlu_stem,gpqa_diamond"
+# DATA_NAME="gpqa_diamond"
 TOKENIZERS_PARALLELISM=false \
 python3 -u math_eval.py \
     --model_name_or_path ${MODEL_NAME_OR_PATH} \

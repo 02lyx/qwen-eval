@@ -498,7 +498,7 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
 #关键提取函数
 def extract_answer(pred_str, data_name, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
-    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023"]: #skip for math benchmark
+    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "gpqa_diamond"]: #skip for math benchmark
         # TODO check multiple choice
         return choice_answer_clean(pred_str)
 
@@ -547,7 +547,7 @@ def extract_answer(pred_str, data_name, use_last_number=True):
 
     # choice answer
     if (
-        data_name in ["sat_math", "aqua"]
+        data_name in ["sat_math", "aqua", "gpqa_diamond"]
         or "mmlu" in data_name
     ): #false for math benchmark
         tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())
@@ -613,6 +613,8 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
         abcd = "ABCD"
         gt_cot, gt_ans = None, abcd[example["answer"]]
     elif data_name == "sat_math":
+        gt_cot, gt_ans = None, example["Answer"]
+    elif data_name == "gpqa_diamond":
         gt_cot, gt_ans = None, example["Answer"]
     elif data_name == "aqua":
         gt_cot, gt_ans = None, example["correct"]
@@ -689,6 +691,15 @@ def parse_question(example, data_name):
                 options = regex.sub(f" {ch}\) ", f" ({ch}) ", options)
         # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options.strip()}"
         question = f"{example['question'].strip()}\nAnswer Choices: {options}"
+    elif data_name == "gpqa_diamond":
+        options = example["options"].strip()
+        assert "A" == options[0]
+        options = "(" + options
+        for ch in "BCD":
+            if f" {ch}) " in options:
+                options = regex.sub(f" {ch}\) ", f" ({ch}) ", options)
+        # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options.strip()}"
+        question = f"{example['question'].strip()}\n"
     elif "aqua" in data_name:
         options = example["options"]
         choice = "(" + "(".join(options)
