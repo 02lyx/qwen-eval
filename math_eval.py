@@ -5,6 +5,7 @@ import time
 from vllm import LLM, SamplingParams
 from datetime import datetime
 from tqdm import tqdm
+from vllm.lora.request import LoRARequest
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -39,6 +40,7 @@ def parse_args():
     parser.add_argument("--save_outputs", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--use_safetensors", action="store_true")
+    parser.add_argument("--lora_path", type=str, default="-1")
     parser.add_argument("--num_shots", type=int, default=0)
     parser.add_argument(
         "--apply_chat_template",
@@ -129,12 +131,24 @@ def setup(args):
         data_list = need_eval_data_list
     
     if args.use_vllm:
-        llm = LLM(
+        print(args.lora_path)
+        print(args.lora_path == "-1")
+        if not (args.lora_path == "-1"):
+            llm = LLM(
             model=args.model_name_or_path,
             tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
-        )
+            enable_lora=True,
+            max_lora_rank=32
+            )
+        else:
+            llm = LLM(
+            model=args.model_name_or_path,
+            tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
+            pipeline_parallel_size=args.pipeline_parallel_size,
+            trust_remote_code=True
+            )
         tokenizer = None
         if args.apply_chat_template:
             tokenizer = AutoTokenizer.from_pretrained(
@@ -279,9 +293,12 @@ def main(llm, tokenizer, data_name, args):
         # get all outputs
         prompts = [item[1] for item in current_prompts]
         if args.use_vllm:
-            outputs = llm.generate(
-                prompts,
-                SamplingParams(
+            if (args.lora_path != "-1"):
+                from huggingface_hub import snapshot_download
+                sql_lora_path = snapshot_download(repo_id=args.lora_path)
+                outputs = llm.generate(
+                    prompts,
+                    SamplingParams(
                     temperature=args.temperature,
                     top_p=args.top_p,
                     max_tokens=args.max_tokens_per_call,
@@ -293,8 +310,24 @@ def main(llm, tokenizer, data_name, args):
                         else None
                     ),
                 ),
-            )
-
+                    lora_request=LoRARequest("sql_adapter", 1, sql_lora_path)
+                )
+            else:
+                outputs = llm.generate(
+                    prompts,
+                    SamplingParams(
+                    temperature=args.temperature,
+                    top_p=args.top_p,
+                    max_tokens=args.max_tokens_per_call,
+                    n=1,
+                    stop=stop_words,
+                    stop_token_ids=(
+                        [151645, 151643]
+                        if "qwen2" in args.model_name_or_path.lower()
+                        else None
+                    ),
+                )
+                )
             outputs = sorted(
                 outputs, key=lambda x: int(x.request_id)
             )  # sort outputs by request_id
