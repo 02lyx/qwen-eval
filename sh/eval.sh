@@ -3,6 +3,7 @@ set -ex
 PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
 OUTPUT_DIR=$3
+LORA_PATH=$4
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
@@ -26,7 +27,8 @@ python3 -u math_eval.py \
     --start 0 \
     --end -1 \
     --use_vllm \
-    --save_outputs 
+    --save_outputs \
+    --lora_path ${LORA_PATH}
 
 # # English multiple-choice datasets
 # DATA_NAME="aqua,sat_math,mmlu_stem"
