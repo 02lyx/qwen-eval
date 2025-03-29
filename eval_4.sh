@@ -6,9 +6,9 @@ PROMPT_TYPE="qwen-brite-template"
 export HF_TOKEN=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
 
 # 设置要评估的模型
-MODEL_NAME_OR_PATH="Yuanxin-Liu/Qwen2.5-7B_Mix-Math-yt-rbt-grpo_0.5_exp12_no_ref_gen_8_test_8_clip_ratio_-1_outer_kl-320"
-OUTPUT_DIR="no-ref-0.5-320-sampling-template"
-
+MODEL_NAME_OR_PATH="Qwen/Qwen2.5-7B"
+OUTPUT_DIR="[rs]-160-sampling"
+LORA_PATH="Yuanxin-Liu/mix-math-7b-Qwen-rs-baseline-global_step_2194"
 export CUDA_VISIBLE_DEVICES=4,5,6,7
 
 echo "========================================================"
@@ -17,6 +17,6 @@ echo "输出目录: $OUTPUT_DIR"
 echo "========================================================"
 
 # 执行评估
-bash sh/eval.sh $PROMPT_TYPE $MODEL_NAME_OR_PATH $OUTPUT_DIR
+bash sh/eval.sh $PROMPT_TYPE $MODEL_NAME_OR_PATH $OUTPUT_DIR $LORA_PATH
 
 echo "基础模型评估完成！"
