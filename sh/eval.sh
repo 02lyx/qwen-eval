@@ -4,13 +4,15 @@ PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
 OUTPUT_DIR=$3
 LORA_PATH=$4
+PROJECT_NAME=$5
+RUN_NAME=$6
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
 
 # English open datasets
 DATA_NAME="math500,minerva_math,olympiadbench,aime24,amc23,mmlu_stem,gpqa_diamond"
-# DATA_NAME="gpqa_diamond"
+# DATA_NAME="aime24"
 TOKENIZERS_PARALLELISM=false \
 python3 -u math_eval.py \
     --model_name_or_path ${MODEL_NAME_OR_PATH} \
@@ -28,7 +30,9 @@ python3 -u math_eval.py \
     --end -1 \
     --use_vllm \
     --save_outputs \
-    --lora_path ${LORA_PATH}
+    --lora_path ${LORA_PATH} \
+    --wandb_project ${PROJECT_NAME} \
+    --wandb_run_name ${RUN_NAME}
 
 # # English multiple-choice datasets
 # DATA_NAME="aqua,sat_math,mmlu_stem"

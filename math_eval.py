@@ -17,7 +17,7 @@ from trajectory import *
 from data_loader import load_data
 from python_executor import PythonExecutor
 from model_utils import load_hf_lm_and_tokenizer, generate_completions
-
+import wandb
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -53,6 +53,8 @@ def parse_args():
         action="store_true",
         help="Few shot for multiple-choice questions, zero shot for others.",
     )
+    parser.add_argument("--wandb_project", type=str, default="qwen-eval")
+    parser.add_argument("--wandb_run_name", type=str, default="default")
     args = parser.parse_args()
     args.top_p = (
         1 if args.temperature == 0 else args.top_p
@@ -109,7 +111,7 @@ def prepare_data(data_name, args):
 
 def setup(args):
     # load model
-    
+    wandb.init(project=args.wandb_project, name=args.wandb_run_name)
     available_gpus = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
     data_list = args.data_names.split(",")
     need_eval_data_list = []
@@ -136,7 +138,7 @@ def setup(args):
         if not (args.lora_path == "-1"):
             llm = LLM(
             model=args.model_name_or_path,
-            tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
+            tensor_parallel_size=1,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
             enable_lora=True,
@@ -145,7 +147,7 @@ def setup(args):
         else:
             llm = LLM(
             model=args.model_name_or_path,
-            tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
+            tensor_parallel_size=1,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True
             )
@@ -179,6 +181,7 @@ def setup(args):
     pad = max([len(data_name) for data_name in data_list])
     print("\t".join(data_name.ljust(pad, " ") for data_name in data_list))
     print("\t".join([f"{result['acc']:.1f}".ljust(pad, " ") for result in results]))
+    wandb.finish()
 
 
 def is_multi_choice(answer):
@@ -452,6 +455,7 @@ def main(llm, tokenizer, data_name, args):
         out_file.replace(".jsonl", f"_metrics.json"), "w"
     ) as f:
         json.dump(result_json, f, indent=4)
+    wandb.log(result_json)
     return result_json
 
 
