@@ -11,7 +11,8 @@ SPLIT="test"
 NUM_TEST_SAMPLE=-1
 
 # English open datasets
-DATA_NAME="math500,minerva_math,olympiadbench,aime24,amc23,mmlu_stem,gpqa_diamond"
+# DATA_NAME="math500,minerva_math,olympiadbench,aime24,amc23,mmlu_stem,gpqa_diamond"
+DATA_NAME="aime24,amc23"
 # DATA_NAME="aime24"
 TOKENIZERS_PARALLELISM=false \
 python3 -u math_eval.py \
@@ -24,7 +25,7 @@ python3 -u math_eval.py \
     --max_tokens_per_call 8192 \
     --seed 0 \
     --temperature 1 \
-    --n_sampling 8 \
+    --n_sampling 64 \
     --top_p 1 \
     --start 0 \
     --end -1 \
