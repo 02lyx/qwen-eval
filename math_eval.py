@@ -138,7 +138,7 @@ def setup(args):
         if not (args.lora_path == "-1"):
             llm = LLM(
             model=args.model_name_or_path,
-            tensor_parallel_size=1,
+            tensor_parallel_size=len(available_gpus)//args.pipeline_parallel_size,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
             enable_lora=True,
@@ -147,7 +147,7 @@ def setup(args):
         else:
             llm = LLM(
             model=args.model_name_or_path,
-            tensor_parallel_size=1,
+            tensor_parallel_size=len(available_gpus)//args.pipeline_parallel_size,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True
             )
